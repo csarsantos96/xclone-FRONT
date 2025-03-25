@@ -12,16 +12,19 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Tentando criar conta...");
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/accounts/login/', {
+      const response = await axios.post('http://127.0.0.1:8000/api/token/', {
         username,
         password,
       });
       // Exemplo: se o backend retornar algo como { token: "abc123" }
       localStorage.setItem('token', response.data.token);
-      navigate('/dashboard');
+      localStorage.setItem('refreshToken', response.data.refresh);
+      navigate('/feed');
     } catch (err) {
       setError('Credenciais inválidas. Verifique usuário e senha.');
+      console.error(err);
     }
   };
 

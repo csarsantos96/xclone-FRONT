@@ -15,8 +15,8 @@
 }
 
 .logo-container {
-  max-width: 300px;
-  max-height: 300px;
+  max-width: 500px;
+  max-height: 500px;
 }
 
 .logo {
@@ -44,6 +44,7 @@
 
 .login-buttons {
   margin-bottom: 1rem;
+  text-align: center;
 }
 
 .button {
@@ -61,28 +62,41 @@
 
 
 .create-account-btn {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  box-sizing: border-box;
+  width: 300px;      
+  padding: 10px 16px; 
+  font-size: 16px;    
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+  
 }
 
 
 .or-container {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin: 1rem 0;
+  justify-content: space-between;
+  width: 30%;
+  margin: 1 rem auto;
+  margin-bottom: 1rem;
+  
+  
 }
 
 .hr {
   flex: 1;
   border: none;
   border-top: 1px solid #444;
-  margin: 0 8px;
+  margin: 0 ;
 }
 
 .or-text {
   color: #ccc;
   font-size: 0.9rem;
+  align-items: center;
+  padding: 0 0.5rem;
 }
 
 .termos {
@@ -96,13 +110,27 @@
 .existing-account {
   margin-top: 1rem;
   font-size: 0.95rem;
+  display: flex;          
+  align-items: center;    
+  gap: 8px;    
 }
 
 
 .link {
-  color: #1d9bf0; 
-  text-decoration: none;
-  margin-left: 0.5rem;
+  width: 300px;
+  display: inline-block;        /* Garante que respeite altura e largura do padding */
+  padding: 10px 16px;
+  border: 1px solid #fff;
+  border-radius: 9999px;        /* "Pílula" */
+  background-color: transparent;
+  color: #fff;
+  text-decoration: none;        /* Remove sublinhado padrão */
+  cursor: pointer;
+  text-align: center;
+
+  /* Transição suave ao hover */
+  transition: background-color 0.2s ease, color 0.2s ease;   
+  
 }
 
 .link:hover {
@@ -113,3 +141,4 @@
 .button:hover {
   background-color: #333;
 }
+

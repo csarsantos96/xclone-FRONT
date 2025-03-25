@@ -1,5 +1,9 @@
 import React from 'react';
-import './LandingPage.css'; // Importa o arquivo de estilo
+import GoogleLoginButton from './GoogleLoginButton';
+import './LandingPage.css'; 
+import { Link } from 'react-router-dom';
+
+import minhaLogo from '../images/twitter-cicle.png'
 
 const LandingPage = () => {
 return (
@@ -8,21 +12,21 @@ return (
     <div className="landing-left">
         <div className="logo-container">
         <img
-            src="https://upload.wikimedia.org/wikipedia/commons/9/9f/X_logo_2023.svg"
+            src={minhaLogo} 
             alt="X Logo"
             className="logo"
         />
         </div>
     </div>
 
-      {/* Lado direito com o conteúdo */}
+    
     <div className="landing-right">
         <h1 className="heading">Acontecendo agora</h1>
         <h2 className="subheading">Inscreva-se hoje</h2>
 
         <div className="login-buttons">
-        <button className="button">Inscrever-se com Google</button>
-        <button className="button">Inscrever-se com Apple</button>
+        <GoogleLoginButton />
+      
         </div>
 
         <div className="or-container">
@@ -31,19 +35,21 @@ return (
         <hr className="hr" />
         </div>
 
-        <button className="button create-account-btn">
-        Criar conta
-        </button>
+        <Link to="/signup" className="button create-account-btn">
+            Criar conta
+        </Link>
 
         <p className="termos">
         Ao inscrever-se, você concorda com nossos Termos de Serviço e Política de Privacidade.
         </p>
-
-        <p className="existing-account">
+        
+        <p className="existing-account"> 
         Já tem uma conta?
+        
         <a href="/login" className="link">Entrar</a>
         </p>
     </div>
+    
     </div>
 );
 };
