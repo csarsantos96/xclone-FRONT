@@ -1,0 +1,40 @@
+.create-post-container {
+    display: flex;
+    padding: 16px;
+    border-bottom: 1px solid #ddd;
+}
+
+.create-post-avatar-wrapper {
+    margin-right: 12px;
+}
+
+.create-post-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.create-post-input-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.create-post-textarea {
+    width: 100%;
+    min-height: 60px;
+    resize: none;
+    padding: 8px;
+    margin-bottom: 8px;
+}
+
+.create-post-button {
+    align-self: flex-end;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background-color: #1da1f2;
+    color: #fff;
+    cursor: pointer;
+}

@@ -1,0 +1,25 @@
+.tweet {
+    display: flex;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .tweet-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin-right: 12px;
+  }
+  
+  .tweet-content {
+    flex: 1;
+  }
+  
+  .like-button {
+    border: none;
+    background: none;
+    color: #e0245e;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
