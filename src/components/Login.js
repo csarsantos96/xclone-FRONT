@@ -12,18 +12,32 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Tentando criar conta...");
+    
+    // Validação simples de campos vazios
+    if (!username || !password) {
+      setError("Por favor, preencha todos os campos.");
+      return;
+    }
+    
     try {
       const response = await axios.post('http://127.0.0.1:8000/api/token/', {
         username,
         password,
       });
-      // Exemplo: se o backend retornar algo como { token: "abc123" }
+      
+      // Armazenando o token e refresh token no localStorage
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('refreshToken', response.data.refresh);
+
+      // Redirecionando o usuário para a página do feed
       navigate('/feed');
     } catch (err) {
-      setError('Credenciais inválidas. Verifique usuário e senha.');
+      // Tratando erro de login
+      if (err.response && err.response.data) {
+        setError(err.response.data.detail || 'Credenciais inválidas. Verifique usuário e senha.');
+      } else {
+        setError('Ocorreu um erro inesperado.');
+      }
       console.error(err);
     }
   };
@@ -55,7 +69,7 @@ const Login = () => {
       </form>
 
       <p className="signup">
-        Não tem uma conta? <a href="/" className="link">Crie agora</a>
+        Não tem uma conta? <a href="/signup" className="link">Crie agora</a>
       </p>
     </div>
   );

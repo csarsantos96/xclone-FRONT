@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react'; // <-- Importa useEffect
+import React, { useEffect } from 'react'; 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import FeedPage from './components/FeedPage';
 import LandingPage from './components/LandingPage';
 import Login from './components/Login';
-import SignUpPage from './components/SingUpPage'; // Corrigido: 'SingUpPage' já está certo se for esse nome mesmo
+import SignUpPage from './components/SingUpPage'; 
 
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebaseConfig";

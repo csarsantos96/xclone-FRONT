@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { auth } from "../firebaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from 'react-router-dom'; 
 import './SignUpPage.css'; 
 
 function SignUpPage() {
@@ -8,39 +9,49 @@ const [username, setUsername] = useState('');
 const [email, setEmail] = useState('');
 const [password, setPassword] = useState('');
 
+const navigate = useNavigate();
+
 const handleSignUp = async (e) => {
-    e.preventDefault();
-    try {
-      // Cria o usuário no Firebase
+  e.preventDefault();
+  try {
+    // Cria o usuário no Firebase
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     console.log("Usuário criado no Firebase:", userCredential.user);
-    
+
     const firebaseUid = userCredential.user.uid;
-    
-      // Opcional: atualizar o displayName do usuário no Firebase se desejar
-      // await updateProfile(userCredential.user, { displayName: username });
-    
-      // Agora, envia os dados para o backend para inserir no PostgreSQL
+
+    // Envia os dados para o backend para inserir no PostgreSQL
     const response = await fetch('http://localhost:8000/api/accounts/createUser/', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          firebaseUid,    // ID do usuário gerado pelo Firebase
-          username,       // Nome de usuário que o usuário informou
-          email           // Email do usuário
-        })
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Token ${localStorage.getItem('authToken')}`,
+      },
+      body: JSON.stringify({
+        firebaseUid,
+        username,
+        email
+      })
     });
     
+
     const data = await response.json();
     console.log('Resposta do backend:', data);
-    
-      // Aqui você pode redirecionar o usuário, exibir uma mensagem, etc.
-    
-    } catch (error) {
-    console.error("Erro no cadastro:", error);
+
+    if (data.detail && data.detail.includes("Verifique seu e-mail")) {
+        // Aqui, podemos redirecionar o usuário para uma página de instrução
+        // ou apenas exibir uma mensagem informando que o e-mail foi enviado
+        navigate('/check-your-email');
+    } else {
+        // Caso haja algum erro, você pode exibir uma mensagem apropriada
+        alert('Erro ao criar conta. Tente novamente.');
     }
+  } catch (error) {
+      console.error("Erro no cadastro:", error.message);
+      if (error.code === 'auth/email-already-in-use'){
+        alert('Este e-mail já está registrado. Tente usar outro.');
+      }
+  }
 };
 
 return (
