@@ -1,78 +1,51 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from '../firebaseConfig';
 import './Login.css';
 
-const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
+function Login() {
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
 
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Validação simples de campos vazios
-    if (!username || !password) {
-      setError("Por favor, preencha todos os campos.");
-      return;
-    }
-    
+  const loginComEmailESenha = async () => {
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/token/', {
-        username,
-        password,
-      });
-      
-      // Armazenando o token e refresh token no localStorage
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('refreshToken', response.data.refresh);
+      await signInWithEmailAndPassword(auth, email, senha);
+      console.log("Logado com email/senha");
+    } catch (error) {
+      console.error("Erro no login por email:", error.message);
+    }
+  };
 
-      // Redirecionando o usuário para a página do feed
-      navigate('/feed');
-    } catch (err) {
-      // Tratando erro de login
-      if (err.response && err.response.data) {
-        setError(err.response.data.detail || 'Credenciais inválidas. Verifique usuário e senha.');
-      } else {
-        setError('Ocorreu um erro inesperado.');
-      }
-      console.error(err);
+  const loginComGoogle = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      console.log("Logado com Google");
+    } catch (error) {
+      console.error("Erro no login com Google:", error.message);
     }
   };
 
   return (
-    <div className="container">
-      <h2 className="title">Entrar</h2>
-      {error && <div className="error">{error}</div>}
-      <form onSubmit={handleSubmit} className="form">
-        <label className="label" htmlFor="username">Usuário</label>
-        <input
-          className="input"
-          type="text"
-          id="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
+    <div>
+      <h2>Login</h2>
+      
+      <input 
+        type="email" 
+        placeholder="Email" 
+        onChange={(e) => setEmail(e.target.value)} 
+      />
+      <input 
+        type="password" 
+        placeholder="Senha" 
+        onChange={(e) => setSenha(e.target.value)} 
+      />
+      <button onClick={loginComEmailESenha}>Entrar com Email</button>
 
-        <label className="label" htmlFor="password">Senha</label>
-        <input
-          className="input"
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+      <hr />
 
-        <button type="submit" className="button">Entrar</button>
-      </form>
-
-      <p className="signup">
-        Não tem uma conta? <a href="/signup" className="link">Crie agora</a>
-      </p>
+      <button onClick={loginComGoogle}>Entrar com Google</button>
     </div>
   );
-};
+}
 
 export default Login;

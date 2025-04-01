@@ -1,24 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { auth } from '../firebaseConfig';
 import './CreatePost.css';
+import { enviarRequisicao } from '../apiService';
 
 function CreatePost({ onPostSuccess }) {
   const [text, setText] = useState('');
-  const user = auth.currentUser;
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(currentUser => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handlePost = async () => {
     if (!text.trim()) return;
-
     if (!user) {
       console.error('Usuário não está logado!');
       return;
     }
 
     try {
-      // Faz a requisição para criar o tweet
+      const token = await user.getIdToken();
       await axios.post(
-        'http://localhost:8000/api/tweets/', // URL correta para criar o tweet
+        'http://localhost:8000/api/tweets/',
         {
           content: text,
           author: user.displayName || 'Anônimo',
@@ -27,15 +34,14 @@ function CreatePost({ onPostSuccess }) {
         },
         {
           headers: {
-            Authorization: `Token 15a2bbc2a1b640eba442e1b44d8b8ca00ae83207`, // Coloque o token correto aqui
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
-      setText('');  // Limpa o campo de texto após o post
+      setText('');
       console.log('Tweet enviado com sucesso!');
-
-      if (onPostSuccess) onPostSuccess(); // Chama a função de sucesso para atualizar o feed
+      if (onPostSuccess) onPostSuccess();
     } catch (error) {
       console.error('Erro ao postar tweet:', error);
     }
@@ -63,6 +69,14 @@ function CreatePost({ onPostSuccess }) {
       </div>
     </div>
   );
+}
+
+export function TesteRequisicao() {
+  useEffect(() => {
+    enviarRequisicao();
+  }, []);
+
+  return <div>Verifique o console para ver a resposta da API.</div>;
 }
 
 export default CreatePost;
