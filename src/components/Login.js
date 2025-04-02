@@ -60,7 +60,7 @@ function Login() {
       
 
       {/* Componente de login com Google */}
-      <GoogleLoginButton onGoogleLogin={loginComGoogle} />
+      <GoogleLoginButton onGoogleLogin={loginComGoogle} className="button"/>
     </div>
   );
 }

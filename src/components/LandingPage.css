@@ -58,6 +58,8 @@
   cursor: pointer;
   text-align: center;
   border-radius: 4px;
+  background-color: #1d9bf0;
+  border-radius: 9999px;
 }
 
 
