@@ -2,21 +2,31 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { auth } from '../firebaseConfig';
 import './CreatePost.css';
-import { enviarRequisicao } from '../apiService';
 
 function CreatePost({ onPostSuccess }) {
   const [text, setText] = useState('');
   const [user, setUser] = useState(null);
+  const [image, setImage] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(currentUser => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       setUser(currentUser);
     });
     return () => unsubscribe();
   }, []);
 
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+
   const handlePost = async () => {
-    if (!text.trim()) return;
+    // Permite post com texto e/ou imagem
+    if (!text.trim() && !image) {
+      console.error('Informe texto ou selecione uma imagem para postar!');
+      return;
+    }
     if (!user) {
       console.error('Usuário não está logado!');
       return;
@@ -24,22 +34,21 @@ function CreatePost({ onPostSuccess }) {
 
     try {
       const token = await user.getIdToken();
-      await axios.post(
-        'http://localhost:8000/api/tweets/',
-        {
-          content: text,
-          author: user.displayName || 'Anônimo',
-          photo_url: user.photoURL || '',
-          uid: user.uid,
+      const formData = new FormData();
+      formData.append('content', text);
+      if (image) {
+        formData.append('media', image);
+      }
+
+      await axios.post('http://localhost:8000/api/tweets/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      });
 
       setText('');
+      setImage(null);
       console.log('Tweet enviado com sucesso!');
       if (onPostSuccess) onPostSuccess();
     } catch (error) {
@@ -51,7 +60,7 @@ function CreatePost({ onPostSuccess }) {
     <div className="create-post-container">
       <div className="create-post-avatar-wrapper">
         <img
-          src={user?.photoURL || "/default-avatar.png"}
+          src={user?.photoURL || '/default-avatar.png'}
           alt="Foto do usuário"
           className="create-post-avatar"
         />
@@ -63,20 +72,36 @@ function CreatePost({ onPostSuccess }) {
           placeholder="O que está acontecendo?"
           className="create-post-textarea"
         />
+        {/* Input de arquivo escondido */}
+        <input
+          id="file-input"
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          style={{ display: 'none' }}
+        />
+        {/* Label estilizado que abre o input de arquivo */}
+        <label htmlFor="file-input" className="custom-file-label">
+          Escolher imagem
+        </label>
+        {/* Mostra o nome do arquivo, se houver */}
+        {image && <p className="file-name">{image.name}</p>}
+        {/* Preview da imagem */}
+        {image && (
+          <div className="image-preview">
+            <img
+              src={URL.createObjectURL(image)}
+              alt="Prévia da imagem"
+              className="preview-img"
+            />
+          </div>
+        )}
         <button onClick={handlePost} className="create-post-button">
           Postar
         </button>
       </div>
     </div>
   );
-}
-
-export function TesteRequisicao() {
-  useEffect(() => {
-    enviarRequisicao();
-  }, []);
-
-  return <div>Verifique o console para ver a resposta da API.</div>;
 }
 
 export default CreatePost;

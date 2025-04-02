@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../firebaseConfig';
+import GoogleLoginButton from './GoogleLoginButton';
 import './Login.css';
 
 function Login() {
@@ -26,24 +27,40 @@ function Login() {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="container">
+      <h2 className="title">Login</h2>
+
+      {/* Se desejar exibir mensagens de erro, adicione aqui */}
       
-      <input 
-        type="email" 
-        placeholder="Email" 
-        onChange={(e) => setEmail(e.target.value)} 
-      />
-      <input 
-        type="password" 
-        placeholder="Senha" 
-        onChange={(e) => setSenha(e.target.value)} 
-      />
-      <button onClick={loginComEmailESenha}>Entrar com Email</button>
+      <div className="form">
+  <label className="label" htmlFor="email">Email</label>
+  <input
+    id="email"
+    type="email"
+    placeholder="Email"
+    className="input"
+    onChange={(e) => setEmail(e.target.value)}
+  />
 
-      <hr />
+  <label className="label" htmlFor="senha">Senha</label>
+  <input
+    id="senha"
+    type="password"
+    placeholder="Senha"
+    className="input"
+    onChange={(e) => setSenha(e.target.value)}
+  />
 
-      <button onClick={loginComGoogle}>Entrar com Google</button>
+  <button onClick={loginComEmailESenha} className="button">
+    Entrar com Email
+  </button>
+</div>
+
+
+      
+
+      {/* Componente de login com Google */}
+      <GoogleLoginButton onGoogleLogin={loginComGoogle} />
     </div>
   );
 }

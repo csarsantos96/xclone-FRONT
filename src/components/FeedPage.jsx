@@ -4,6 +4,7 @@ import { auth } from '../firebaseConfig';
 import { onAuthStateChanged } from "firebase/auth";
 import './FeedPage.css';
 import CreatePost from '../components/CreatePost';
+import LogoutButton from './LogOutButton';
 
 
 
@@ -47,7 +48,10 @@ function FeedPage() {
   
     return (
         <div className="feed-container">
-          <h2>Feed de Tweets</h2> 
+          <header className="feed-header">
+          <h2>Feed de Tweets</h2>
+          <LogoutButton />
+      </header>
 
           {firebaseUser && (
       <div className="user-info">
@@ -67,9 +71,9 @@ function FeedPage() {
                 <div>{tweet.content}</div>
                 <div className="date">{new Date(tweet.created_at).toLocaleString()}</div>
                 <div className="tweet-actions">
+                  <button className="action-button">❤️</button>
                   <button className="action-button">💬</button>
                   <button className="action-button">🔁</button>
-                  <button className="action-button">❤️</button>
                 </div>
               </div>
             ))

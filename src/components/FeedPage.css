@@ -2,6 +2,21 @@
     max-width: 600px;
     margin: 40px auto;
     padding: 0 20px;
+    
+}
+
+.feed-header {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;           
+    margin-bottom: 16px;
+}
+
+
+.feed-header h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
 }
 
 .tweet-card {

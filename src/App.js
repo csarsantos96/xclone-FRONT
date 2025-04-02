@@ -7,6 +7,8 @@ import Login from './components/Login';
 import SignUpPage from './components/SingUpPage';
 import { auth } from './firebaseConfig';
 import { onAuthStateChanged } from "firebase/auth";
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 
 function App() {
   useEffect(() => {
