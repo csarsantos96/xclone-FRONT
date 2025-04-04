@@ -31,6 +31,7 @@
 }
 
 .button {
+  width: 100%;   
   box-sizing: border-box;
   width: 300px;      
   padding: 10px 16px; 
@@ -39,6 +40,7 @@
   cursor: pointer;
   text-decoration: none;
   background-color: #1d9bf0;
+  
 }
 
 .signup {
@@ -49,4 +51,16 @@
   color: #1d9bf0;
   text-decoration: none;
   font-weight: bold;
+}
+
+.google-button {
+  /* Se quiser mudar apenas a cor de fundo do Google */
+  background-color: #fff;
+  color: #555;
+  border: 1px solid #ddd;
+}
+
+/* Caso queira efeito de hover diferente para o Google */
+.google-button:hover {
+  background-color: #f1f1f1;
 }
