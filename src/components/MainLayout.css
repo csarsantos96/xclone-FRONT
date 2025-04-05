@@ -1,13 +1,12 @@
-/* MainLayout.css */
 .app-container {
   display: flex;
   min-height: 100vh;
-  background-color: #15202B; /* Fundo escuro */
+  background-color: #15202B;
   color: #fff;
   font-family: Arial, sans-serif;
+  gap: 20px;
 }
 
-/* Sidebar Esquerda */
 .sidebar-left {
   width: 250px;
   background-color: #15202B;
@@ -24,8 +23,8 @@
 
 .sidebar-left ul {
   list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 
 .sidebar-left li {
@@ -35,28 +34,28 @@
 .sidebar-left li a {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 8px;
   color: #fff;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   padding: 10px 20px;
-  border-radius: 30px;
+  border-radius: 9999px;
   text-decoration: none;
   transition: background 0.2s;
 }
 
 .sidebar-left li a:hover {
-  background-color: rgba(29, 155, 240, 0.5);
+  background-color: rgba(29, 155, 240, 0.2);
   color: #fff;
 }
 
-/* Conteúdo Principal */
 .main-content {
   flex: 1;
+  max-width: 600px;
+  margin: 0 auto;
   padding: 20px;
   border-right: 1px solid #2f3336;
 }
 
-/* Sidebar Direita */
 .sidebar-right {
   width: 350px;
   padding: 20px;

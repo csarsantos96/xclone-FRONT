@@ -23,3 +23,9 @@
     font-size: 1rem;
   }
   
+  .modal-actions {
+    display: flex;
+    gap: 20px; /* Aumente este valor para mais espaço entre botões */
+    justify-content: flex-end;
+  }
+  

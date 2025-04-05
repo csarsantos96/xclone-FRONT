@@ -1,4 +1,3 @@
-// App.js
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LandingPage from './components/LandingPage';
@@ -13,7 +12,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 function App() {
-  // Correto: tanto o valor quanto a função são definidos
+  // Correto: inclui firebaseUser E setFirebaseUser
   const [firebaseUser, setFirebaseUser] = useState(null);
 
   useEffect(() => {
@@ -38,7 +37,7 @@ function App() {
           <Route element={<MainLayout />}>
             <Route path="/feed" element={<FeedPage />} />
             <Route path="/explore" element={<ExplorePage />} />
-            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/:username" element={<ProfilePage />} />
           </Route>
         </Routes>
       </div>

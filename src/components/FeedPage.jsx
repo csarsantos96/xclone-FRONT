@@ -1,24 +1,26 @@
-// FeedPage.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { auth } from '../firebaseConfig';
 import { onAuthStateChanged } from "firebase/auth";
-import CreatePost from './CreatePost';
+import CreatePost from '../components/CreatePost';
 import LogoutButton from './LogOutButton';
-
+import TweetCard from './TweetCard';
+import './FeedPage.css'; // Arquivo de estilos
 
 function FeedPage() {
   const [tweets, setTweets] = useState([]);
   const [firebaseUser, setFirebaseUser] = useState(null);
+  const [token, setToken] = useState('');
 
   const fetchTweets = async (user) => {
     if (!user) return;
     try {
-      const token = await user.getIdToken();
+      const t = await user.getIdToken();
+      setToken(t);
       const response = await axios.get("http://localhost:8000/api/tweets/feed/", {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${t}`,
+        },
       });
       setTweets(response.data.results || response.data);
     } catch (error) {
@@ -38,38 +40,41 @@ function FeedPage() {
     return () => unsubscribe();
   }, []);
 
+  // Função para atualizar a lista de tweets após a exclusão
+  const handleDeleteTweet = (tweetId) => {
+    setTweets((prevTweets) => prevTweets.filter(tweet => tweet.id !== tweetId));
+  };
+
+  // Função para inserir o novo tweet (retweet) no feed
+  const handleRepostInFeed = (newTweet) => {
+    setTweets((prevTweets) => [newTweet, ...prevTweets]);
+  };
+
   return (
-    <div className="main-feed">
-      <header className="feed-header">
+    <div className="feed-container">
+      {/* Barra superior */}
+      <header className="top-bar">
         <h2>Home</h2>
         <LogoutButton />
       </header>
 
-      {firebaseUser && (
-        <div className="user-info">
-          <span>{firebaseUser.displayName}</span>
-        </div>
-      )}
-
+      {/* Caixa de criação de post */}
       <CreatePost onPostSuccess={() => fetchTweets(firebaseUser)} />
 
-      {tweets.map((tweet) => (
-        <div key={tweet.id} className="tweet-card">
-          <div className="author">{tweet.author?.username || 'Anônimo'}</div>
-          <div>{tweet.content}</div>
-          {tweet.media && (
-            <div className="tweet-image-wrapper">
-              <img src={tweet.media} alt="Imagem do tweet" className="tweet-image" />
-            </div>
-          )}
-          <div className="date">{new Date(tweet.created_at).toLocaleString()}</div>
-          <div className="tweet-actions">
-            <button className="action-button">❤️</button>
-            <button className="action-button">💬</button>
-            <button className="action-button">🔁</button>
-          </div>
-        </div>
-      ))}
+      {/* Lista de tweets */}
+      {tweets.length === 0 ? (
+        <p>Nenhum tweet por enquanto.</p>
+      ) : (
+        tweets.map((tweet) => (
+          <TweetCard 
+            key={tweet.id} 
+            tweet={{ ...tweet, currentUserId: firebaseUser?.id }}
+            token={token}
+            onDelete={handleDeleteTweet}
+            onRepost={handleRepostInFeed}
+          />
+        ))
+      )}
     </div>
   );
 }

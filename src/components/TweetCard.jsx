@@ -1,9 +1,26 @@
+// TweetCard.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
 import './TweetCard.css';
 
-function TweetCard({ tweet, token, onLiked }) {
+function RepostModal({ onClose, onConfirm }) {
+  return (
+    <div className="modal-backdrop">
+      <div className="modal-content">
+        <h2>Repostar Tweet</h2>
+        <p>Deseja repostar este tweet?</p>
+        <div className="modal-actions">
+          <button onClick={onConfirm}>Sim</button>
+          <button onClick={onClose}>Cancelar</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TweetCard({ tweet, token, onDelete, onLiked, onRepost }) {
   const [liked, setLiked] = useState(tweet.is_liked);
+  const [showRepostModal, setShowRepostModal] = useState(false);
 
   const handleLike = async () => {
     try {
@@ -12,37 +29,95 @@ function TweetCard({ tweet, token, onLiked }) {
         {},
         {
           headers: {
-            Authorization: `Token ${token}`,
-        },
+            Authorization: `Bearer ${token}`,
+          },
         }
-    );
-    setLiked(response.data.status === 'liked');
-    
-    if (onLiked) onLiked(); 
+      );
+      setLiked(response.data.status === 'liked');
+      if (onLiked) onLiked();
     } catch (err) {
-    console.error('Erro ao curtir:', err);
+      console.error('Erro ao curtir:', err);
     }
-};
+  };
 
-return (
-    <div className="tweet">
-    <img
-        src={tweet.user?.photoURL || '/default-avatar.png'}
-        alt="Avatar"
-        className="tweet-avatar"
-    />
-    <div className="tweet-content">
-        <strong>{tweet.user?.name || 'Anônimo'}</strong>
-        <p>{tweet.text}</p>
-        <button className="like-button" onClick={handleLike}>
-        {liked ? '💔 Descurtir' : '❤️ Curtir'}
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`http://localhost:8000/api/tweets/${tweet.id}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (onDelete) onDelete(tweet.id);
+    } catch (err) {
+      console.error('Erro ao apagar tweet:', err);
+    }
+  };
+
+  // Função para abrir o modal de reply (exemplo simples)
+  const handleReply = () => {
+    alert('Abrir modal de reply para o tweet!');
+  };
+
+  // Abre o modal de repost
+  const handleRepost = () => {
+    setShowRepostModal(true);
+  };
+
+  // Confirma o repost: faz a requisição, retorna o novo tweet e o adiciona ao feed
+  const confirmRepost = async () => {
+    setShowRepostModal(false);
+    try {
+      const response = await axios.post(
+        `http://localhost:8000/api/tweets/${tweet.id}/retweet/`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      // response.data contém o novo tweet
+      if (onRepost) onRepost(response.data);
+      alert('Tweet repostado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao repostar tweet:', error);
+    }
+  };
+
+  return (
+    <div className="tweet-card">
+      <div className="author">{tweet.author?.username || 'Anônimo'}</div>
+      <div>{tweet.content}</div>
+      {tweet.media && (
+        <div className="tweet-image-wrapper">
+          <img src={tweet.media} alt="Imagem do tweet" className="tweet-image" />
+        </div>
+      )}
+      <div className="date">{new Date(tweet.created_at).toLocaleString()}</div>
+      <div className="tweet-actions">
+        <button className="action-button" onClick={handleLike}>
+          {liked ? '💔 Descurtir' : '❤️ Curtir'}
         </button>
-        <p style={{ marginTop: '4px', fontSize: '0.9rem', color: '#999' }}>
-        ❤️ {tweet.likes_count} {tweet.likes_count === 1 ? 'curtida' : 'curtidas'}
-        </p>
-</div>
+        <button className="action-button" onClick={handleReply}>
+          💬 Reply
+        </button>
+        <button className="action-button" onClick={handleRepost}>
+          🔁 Repost
+        </button>
+        {tweet.author?.id === tweet.currentUserId && (
+          <button className="action-button" onClick={handleDelete}>
+            🗑️ Apagar
+          </button>
+        )}
+      </div>
+      {showRepostModal && (
+        <RepostModal
+          onClose={() => setShowRepostModal(false)}
+          onConfirm={confirmRepost}
+        />
+      )}
     </div>
-);
+  );
 }
 
 export default TweetCard;

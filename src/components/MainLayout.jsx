@@ -1,11 +1,19 @@
-// src/components/MainLayout.jsx
+// MainLayout.jsx
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth'; // Esse hook deve retornar o firebaseUser
-import './MainLayout.css'; // Estilos para o layout
+import { useAuth } from '../hooks/useAuth';
+import './MainLayout.css';
+
+function slugify(text) {
+  if (!text) return '';
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, '')
+    .toLowerCase();
+}
 
 function MainLayout() {
-  // Supondo que useAuth retorne { firebaseUser }
   const { firebaseUser } = useAuth();
 
   return (
@@ -29,7 +37,7 @@ function MainLayout() {
             </li>
             <li>
               {firebaseUser ? (
-                <Link to={`/profile/${firebaseUser.displayName}`}>
+                <Link to={`/profile/${slugify(firebaseUser.displayName || firebaseUser.name || firebaseUser.uid)}`}>
                   <i className="fa-regular fa-user"></i>
                   <span>Profile</span>
                 </Link>
@@ -46,7 +54,7 @@ function MainLayout() {
 
       {/* Conteúdo Principal */}
       <main className="main-content">
-        <Outlet /> {/* Aqui serão renderizadas as páginas Feed, Explore, Profile, etc. */}
+        <Outlet />
       </main>
 
       {/* Sidebar Direita */}

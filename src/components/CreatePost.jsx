@@ -22,7 +22,6 @@ function CreatePost({ onPostSuccess }) {
   };
 
   const handlePost = async () => {
-    // Permite post com texto e/ou imagem
     if (!text.trim() && !image) {
       console.error('Informe texto ou selecione uma imagem para postar!');
       return;
@@ -56,21 +55,27 @@ function CreatePost({ onPostSuccess }) {
     }
   };
 
+  // Exemplo de nome de usuário:
+  const displayName = user?.displayName || 'Usuário';
+
   return (
     <div className="create-post-container">
-      <div className="create-post-avatar-wrapper">
+      {/* Cabeçalho do create post: avatar + nome lado a lado */}
+      <div className="create-post-header">
         <img
           src={user?.photoURL || '/default-avatar.png'}
           alt="Foto do usuário"
           className="create-post-avatar"
         />
+        <span className="create-post-user-name">{displayName}</span>
       </div>
+
       <div className="create-post-input-area">
         <textarea
+          className="create-post-textarea"
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="O que está acontecendo?"
-          className="create-post-textarea"
         />
         {/* Input de arquivo escondido */}
         <input
@@ -80,13 +85,17 @@ function CreatePost({ onPostSuccess }) {
           onChange={handleImageChange}
           style={{ display: 'none' }}
         />
-        {/* Label estilizado que abre o input de arquivo */}
-        <label htmlFor="file-input" className="custom-file-label">
-          Escolher imagem
+        {/* Ícone de imagem no canto inferior esquerdo */}
+        <label htmlFor="file-input" className="image-icon-button">
+          <i className="fa-solid fa-image"></i>
         </label>
-        {/* Mostra o nome do arquivo, se houver */}
+        {/* Botão Postar no canto inferior direito */}
+        <button onClick={handlePost} className="create-post-button">
+          Postar
+        </button>
+
+        {/* Opcional: mostrar o nome do arquivo e preview */}
         {image && <p className="file-name">{image.name}</p>}
-        {/* Preview da imagem */}
         {image && (
           <div className="image-preview">
             <img
@@ -96,9 +105,6 @@ function CreatePost({ onPostSuccess }) {
             />
           </div>
         )}
-        <button onClick={handlePost} className="create-post-button">
-          Postar
-        </button>
       </div>
     </div>
   );
