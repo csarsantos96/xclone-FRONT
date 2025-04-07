@@ -1,3 +1,4 @@
+// ProfilePage.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { auth } from '../firebaseConfig';
@@ -10,12 +11,12 @@ function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [tweets, setTweets] = useState([]);
   const [firebaseUser, setFirebaseUser] = useState(null);
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false); // Estado para indicar se o usuário logado segue o perfil
   const { username } = useParams();
   const [errorMsg, setErrorMsg] = useState('');
   const [showEditModal, setShowEditModal] = useState(false);
 
-  // Atualiza o perfil depois de ser editado
+  // Função para atualizar o perfil após edição
   const handleProfileUpdated = (updatedProfile) => {
     setProfile(updatedProfile);
   };
@@ -28,23 +29,24 @@ function ProfilePage() {
     return () => unsubscribe();
   }, []);
 
-  // Busca os dados do perfil e dos tweets
+  // Busca os dados do perfil e dos tweets do backend
   useEffect(() => {
     if (!firebaseUser) return;
     const fetchProfileData = async () => {
       try {
         const token = await firebaseUser.getIdToken();
-        // Busca os dados do perfil pelo username (rota do backend)
+        // Obtém os dados do usuário pelo username (rota do backend)
         const userResponse = await axios.get(
           `http://localhost:8000/api/accounts/${username}/`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        setProfile(userResponse.data);
-        // Atualiza o estado de follow se o backend fornecer esse campo
-        if (typeof userResponse.data.is_following === 'boolean') {
-          setIsFollowing(userResponse.data.is_following);
+        const fetchedProfile = userResponse.data;
+        setProfile(fetchedProfile);
+        // Se a API retornar o campo is_following, atualizamos o estado
+        if (typeof fetchedProfile.is_following === 'boolean') {
+          setIsFollowing(fetchedProfile.is_following);
         }
-        // Busca os tweets do usuário
+        // Obtém os tweets do usuário
         const tweetsResponse = await axios.get(
           `http://localhost:8000/api/tweets/user/${username}/`,
           { headers: { Authorization: `Bearer ${token}` } }
@@ -58,28 +60,29 @@ function ProfilePage() {
     fetchProfileData();
   }, [firebaseUser, username]);
 
-  // Exibe uma mensagem de erro ou "loading" enquanto os dados não chegam
+  // Enquanto houver erro ou o profile não for carregado, exibe uma mensagem apropriada
   if (errorMsg) return <div>{errorMsg}</div>;
   if (!profile) return <div>Carregando perfil...</div>;
 
-  // Lógica de fallback para a foto de perfil
-  const profilePic = profile.profile_image || '/default-avatar.png';
+  // Fallback para a foto de perfil: utiliza profile.profile_image se existir, senão um avatar default
+  const profilePic = profile?.profile_image || '/default-avatar.png';
 
-  // Determina se o perfil exibido é do próprio usuário logado (obtido via /me/)
-  const isOwnProfile = firebaseUser && firebaseUser.uid === profile.firebase_uid;
+  // Define se o perfil acessado é o do usuário logado.
+  // É importante que o backend retorne o username do usuário logado de forma consistente.
+  const isOwnProfile = 
+  !!(firebaseUser && profile && profile.email && (profile.email === firebaseUser.email));
 
-  // Função para seguir ou deixar de seguir o usuário (para perfis que não são do usuário logado)
+  // Função para seguir/deixar de seguir o usuário
   const handleFollowToggle = async () => {
     try {
       const token = await firebaseUser.getIdToken();
-      // Observe que a URL termina com uma barra para evitar problemas com APPEND_SLASH
       const response = await axios.post(
         `http://localhost:8000/api/accounts/follow/${profile.username}/`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setIsFollowing(response.data.is_following);
-      // Atualiza o número de seguidores no perfil
+      // Atualiza a contagem de seguidores conforme o retorno da API
       setProfile((prev) => ({
         ...prev,
         followers_count: response.data.followers_count,
@@ -94,7 +97,7 @@ function ProfilePage() {
       <div className="profile-header" style={{ position: 'relative' }}>
         <img
           className="cover-photo"
-          src={profile.cover_image || '/default-cover.png'}
+          src={profile?.cover_image || '/default-cover.png'}
           alt="Cover"
         />
         <div className="profile-info">
@@ -110,7 +113,7 @@ function ProfilePage() {
             <span>{profile.followers_count} seguidores</span>
           </div>
         </div>
-        {/* Se o perfil é do usuário logado, exibe "Editar Perfil", senão exibe o botão de seguir */}
+        {/* Se for o próprio perfil do usuário logado, exibe "Editar Perfil"; caso contrário, o botão de seguir */}
         {isOwnProfile ? (
           <button
             className="edit-profile-button"
@@ -137,6 +140,7 @@ function ProfilePage() {
         />
       )}
 
+      {/* Lista de tweets do usuário */}
       <div className="profile-tweets">
         {tweets.length === 0 ? (
           <p>Nenhum tweet por enquanto.</p>
