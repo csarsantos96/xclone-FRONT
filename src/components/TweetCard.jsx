@@ -1,4 +1,3 @@
-// TweetCard.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
 import './TweetCard.css';
@@ -76,7 +75,6 @@ function TweetCard({ tweet, token, onDelete, onLiked, onRepost }) {
           },
         }
       );
-      // response.data contém o novo tweet
       if (onRepost) onRepost(response.data);
       alert('Tweet repostado com sucesso!');
     } catch (error) {
@@ -86,7 +84,16 @@ function TweetCard({ tweet, token, onDelete, onLiked, onRepost }) {
 
   return (
     <div className="tweet-card">
-      <div className="author">{tweet.author?.username || 'Anônimo'}</div>
+      <div className="author">
+        {tweet.author ? (
+          <>
+            <div className="author-name">{tweet.author.name}</div>
+            <div className="author-username">@{tweet.author.username}</div>
+          </>
+        ) : (
+          'Anônimo'
+        )}
+      </div>
       <div>{tweet.content}</div>
       {tweet.media && (
         <div className="tweet-image-wrapper">

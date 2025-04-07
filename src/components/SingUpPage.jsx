@@ -1,110 +1,171 @@
 import React, { useState } from 'react';
 import { auth } from "../firebaseConfig";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { useNavigate } from 'react-router-dom'; 
-import './SignUpPage.css'; 
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from "firebase/auth";
+import { useNavigate } from 'react-router-dom';
+import GoogleLoginButton from './GoogleLoginButton'; //
+import './SignUpPage.css';
 
 function SignUpPage() {
-const [username, setUsername] = useState('');
-const [email, setEmail] = useState('');
-const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [name, setName] = useState(''); // opcional, se quiser atualizar o display name
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
-const handleSignUp = async (e) => {
-  e.preventDefault();
-  try {
-    // Cria o usuário no Firebase
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    console.log("Usuário criado no Firebase:", userCredential.user);
+  // Fluxo de cadastro com e-mail/senha
+  const handleSignUpEmail = async (e) => {
+    e.preventDefault();
+    try {
+      // Cria o usuário no Firebase com e-mail e senha
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      console.log("Usuário criado no Firebase:", userCredential.user);
 
-    const firebaseUid = userCredential.user.uid;
-
-    // Envia os dados para o backend para inserir no PostgreSQL
-    const response = await fetch('http://localhost:8000/api/accounts/createUser/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Token ${localStorage.getItem('authToken')}`,
-      },
-      body: JSON.stringify({
-        firebaseUid,
-        username,
-        email
-      })
-    });
-    
-
-    const data = await response.json();
-    console.log('Resposta do backend:', data);
-
-    if (data.detail && data.detail.includes("Verifique seu e-mail")) {
-        // Aqui, podemos redirecionar o usuário para uma página de instrução
-        // ou apenas exibir uma mensagem informando que o e-mail foi enviado
-        navigate('/check-your-email');
-    } else {
-        // Caso haja algum erro, você pode exibir uma mensagem apropriada
-        alert('Erro ao criar conta. Tente novamente.');
-    }
-  } catch (error) {
-      console.error("Erro no cadastro:", error.message);
-      if (error.code === 'auth/email-already-in-use'){
-        alert('Este e-mail já está registrado. Tente usar outro.');
+      // Atualiza o display name, se desejar
+      if (name) {
+        await updateProfile(userCredential.user, { displayName: name });
       }
-  }
-};
 
-return (
+      const firebaseUid = userCredential.user.uid;
+      const token = await userCredential.user.getIdToken();
+
+      // Envia os dados para o backend para inserir no PostgreSQL
+      const response = await fetch('http://localhost:8000/api/accounts/createUser/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          firebaseUid,
+          username,
+          
+          email,
+        })
+      });
+
+      const data = await response.json();
+      console.log('Resposta do backend:', data);
+
+      if (data.detail && data.detail.includes("Verifique seu e-mail")) {
+        navigate('/check-your-email');
+      } else {
+        navigate('/feed');
+      }
+    } catch (err) {
+      console.error("Erro no cadastro com e-mail:", err.message);
+      if (err.code === 'auth/email-already-in-use') {
+        setError('Este e-mail já está registrado. Tente usar outro.');
+      } else {
+        setError(err.message);
+      }
+    }
+  };
+
+  // Fluxo de cadastro/login com Google
+  const handleSignUpGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      console.log("Usuário logado com Google:", userCredential.user);
+
+      const firebaseUid = userCredential.user.uid;
+      const token = await userCredential.user.getIdToken();
+
+      // Envia os dados para o backend
+      const response = await fetch('http://localhost:8000/api/accounts/createUser/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          firebaseUid,
+          username: userCredential.user.displayName, // ou peça para o usuário definir um username adicional, se necessário
+          email: userCredential.user.email,
+        })
+      });
+
+      const data = await response.json();
+      console.log('Resposta do backend:', data);
+
+      navigate('/feed');
+    } catch (err) {
+      console.error("Erro no cadastro/login com Google:", err.message);
+      setError('Erro ao autenticar com o Google. Tente novamente.');
+    }
+  };
+
+  return (
     <div className="signup-container">
-    <h1 className="signup-heading">Criar sua conta</h1>
+      <h1 className="signup-heading">Criar sua conta</h1>
 
-    <form className="signup-form" onSubmit={handleSignUp}>
+      {error && <p className="error-msg">{error}</p>}
+
+      <form className="signup-form" onSubmit={handleSignUpEmail}>
         <div className="form-group">
-        <label htmlFor="username">Nome de usuário</label>
-        <input
+          <label htmlFor="name">Nome (opcional):</label>
+          <input
+            id="name"
+            type="text"
+            placeholder="Seu nome"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="username">Nome de usuário (comece com @):</label>
+          <input
             id="username"
             type="text"
             placeholder="Seu nome de usuário"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-        />
+          />
         </div>
 
         <div className="form-group">
-        <label htmlFor="email">E-mail</label>
-        <input
+          <label htmlFor="email">E-mail:</label>
+          <input
             id="email"
             type="email"
             placeholder="seuemail@exemplo.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-        />
+          />
         </div>
 
         <div className="form-group">
-        <label htmlFor="password">Senha</label>
-        <input
+          <label htmlFor="password">Senha:</label>
+          <input
             id="password"
             type="password"
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-        />
+          />
         </div>
 
         <button type="submit" className="signup-btn">
-        Criar conta
+          Criar conta com E-mail
         </button>
-    </form>
+      </form>
 
-    <p className="login-redirect">
+      <br />
+
+      {/* Botão para autenticação via Google */}
+      <GoogleLoginButton onClick={handleSignUpGoogle} />
+
+      <p className="login-redirect">
         Já tem uma conta? <a href="/login" className="login-link">Entrar</a>
-    </p>
+      </p>
     </div>
-);
+  );
 }
 
 export default SignUpPage;

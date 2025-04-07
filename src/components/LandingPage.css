@@ -120,17 +120,15 @@
 
 .link {
   width: 300px;
-  display: inline-block;        /* Garante que respeite altura e largura do padding */
+  display: inline-block;        
   padding: 10px 16px;
-  
-  border-radius: 9999px;        /* "Pílula" */
+  border-radius: 9999px;        
   background-color: #1d9bf0;
   color: #fff;
-  text-decoration: none;        /* Remove sublinhado padrão */
+  text-decoration: none;        
   cursor: pointer;
   text-align: center;
 
-  /* Transição suave ao hover */
   transition: background-color 0.2s ease, color 0.2s ease;   
   
 }
