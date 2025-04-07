@@ -10,11 +10,12 @@ function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [tweets, setTweets] = useState([]);
   const [firebaseUser, setFirebaseUser] = useState(null);
+  const [isFollowing, setIsFollowing] = useState(false);
   const { username } = useParams();
   const [errorMsg, setErrorMsg] = useState('');
   const [showEditModal, setShowEditModal] = useState(false);
 
-  // Atualiza o perfil depois da edição
+  // Atualiza o perfil depois de ser editado
   const handleProfileUpdated = (updatedProfile) => {
     setProfile(updatedProfile);
   };
@@ -33,11 +34,17 @@ function ProfilePage() {
     const fetchProfileData = async () => {
       try {
         const token = await firebaseUser.getIdToken();
+        // Busca os dados do perfil pelo username (rota do backend)
         const userResponse = await axios.get(
           `http://localhost:8000/api/accounts/${username}/`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setProfile(userResponse.data);
+        // Atualiza o estado de follow se o backend fornecer esse campo
+        if (typeof userResponse.data.is_following === 'boolean') {
+          setIsFollowing(userResponse.data.is_following);
+        }
+        // Busca os tweets do usuário
         const tweetsResponse = await axios.get(
           `http://localhost:8000/api/tweets/user/${username}/`,
           { headers: { Authorization: `Bearer ${token}` } }
@@ -51,15 +58,39 @@ function ProfilePage() {
     fetchProfileData();
   }, [firebaseUser, username]);
 
+  // Exibe uma mensagem de erro ou "loading" enquanto os dados não chegam
   if (errorMsg) return <div>{errorMsg}</div>;
   if (!profile) return <div>Carregando perfil...</div>;
 
-  // Lógica de fallback para a foto de perfil:
+  // Lógica de fallback para a foto de perfil
   const profilePic = profile.profile_image || '/default-avatar.png';
+
+  // Determina se o perfil exibido é do próprio usuário logado (obtido via /me/)
+  const isOwnProfile = firebaseUser && firebaseUser.uid === profile.firebase_uid;
+
+  // Função para seguir ou deixar de seguir o usuário (para perfis que não são do usuário logado)
+  const handleFollowToggle = async () => {
+    try {
+      const token = await firebaseUser.getIdToken();
+      // Observe que a URL termina com uma barra para evitar problemas com APPEND_SLASH
+      const response = await axios.post(
+        `http://localhost:8000/api/accounts/follow/${profile.username}/`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setIsFollowing(response.data.is_following);
+      // Atualiza o número de seguidores no perfil
+      setProfile((prev) => ({
+        ...prev,
+        followers_count: response.data.followers_count,
+      }));
+    } catch (err) {
+      console.error("Erro ao seguir/deixar de seguir:", err);
+    }
+  };
 
   return (
     <div className="profile-container">
-      {/* Adiciona position: relative para posicionamento absoluto do botão */}
       <div className="profile-header" style={{ position: 'relative' }}>
         <img
           className="cover-photo"
@@ -79,21 +110,28 @@ function ProfilePage() {
             <span>{profile.followers_count} seguidores</span>
           </div>
         </div>
-        {/* Botão de Editar Perfil posicionado no canto inferior direito */}
-        {profile.username === username && (
-          <button 
-            className="edit-profile-button" 
+        {/* Se o perfil é do usuário logado, exibe "Editar Perfil", senão exibe o botão de seguir */}
+        {isOwnProfile ? (
+          <button
+            className="edit-profile-button"
             onClick={() => setShowEditModal(true)}
           >
             Editar Perfil
+          </button>
+        ) : (
+          <button
+            className={`follow-button ${isFollowing ? 'following' : 'not-following'}`}
+            onClick={handleFollowToggle}
+          >
+            {isFollowing ? 'Seguindo' : 'Seguir'}
           </button>
         )}
       </div>
 
       {showEditModal && (
         <EditProfileModal
-          user={profile}             // Perfil retornado pelo backend
-          firebaseUser={firebaseUser} // Objeto do Firebase para getIdToken
+          user={profile}
+          firebaseUser={firebaseUser}
           onClose={() => setShowEditModal(false)}
           onProfileUpdated={handleProfileUpdated}
         />

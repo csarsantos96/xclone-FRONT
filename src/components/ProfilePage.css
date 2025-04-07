@@ -114,3 +114,40 @@
 .edit-profile-button:hover {
   background-color: #333;
 }
+
+
+
+
+/* Botão de Follow - estilos básicos */
+.follow-button {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: 1px solid #000;
+}
+
+/* Quando o usuário já está seguindo: fundo preto, texto branco */
+.follow-button.following {
+  background-color: #000;
+  color: #fff;
+}
+
+/* Quando não está seguindo: fundo branco, texto preto */
+.follow-button.not-following {
+  background-color: #fff;
+  color: #000;
+}
+
+/* Hover para o botão follow, ajusta um pouco o fundo */
+.follow-button.following:hover {
+  background-color: #333;
+}
+
+.follow-button.not-following:hover {
+  background-color: #e6e6e6;
+}
