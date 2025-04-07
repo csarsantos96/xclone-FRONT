@@ -55,12 +55,10 @@ function CreatePost({ onPostSuccess }) {
     }
   };
 
-  // Exemplo de nome de usuário:
   const displayName = user?.displayName || 'Usuário';
 
   return (
     <div className="create-post-container">
-      {/* Cabeçalho do create post: avatar + nome lado a lado */}
       <div className="create-post-header">
         <img
           src={user?.photoURL || '/default-avatar.png'}
@@ -77,7 +75,6 @@ function CreatePost({ onPostSuccess }) {
           onChange={(e) => setText(e.target.value)}
           placeholder="O que está acontecendo?"
         />
-        {/* Input de arquivo escondido */}
         <input
           id="file-input"
           type="file"
@@ -85,16 +82,12 @@ function CreatePost({ onPostSuccess }) {
           onChange={handleImageChange}
           style={{ display: 'none' }}
         />
-        {/* Ícone de imagem no canto inferior esquerdo */}
         <label htmlFor="file-input" className="image-icon-button">
           <i className="fa-solid fa-image"></i>
         </label>
-        {/* Botão Postar no canto inferior direito */}
         <button onClick={handlePost} className="create-post-button">
           Postar
         </button>
-
-        {/* Opcional: mostrar o nome do arquivo e preview */}
         {image && <p className="file-name">{image.name}</p>}
         {image && (
           <div className="image-preview">
