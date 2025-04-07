@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { auth } from '../firebaseConfig';
+import { onAuthStateChanged } from 'firebase/auth';
 import './CreatePost.css';
+
+// Função para garantir que a imagem tenha a URL completa
+function getFullImageUrl(imagePath) {
+  if (!imagePath) return null;
+  // Se já for URL completa, retorna
+  if (imagePath.startsWith('http')) {
+    return imagePath;
+  }
+  // Caso contrário, concatena a URL base (ajuste conforme seu ambiente)
+  return `http://localhost:8000${imagePath}`;
+}
 
 function CreatePost({ onPostSuccess }) {
   const [text, setText] = useState('');
@@ -9,8 +21,20 @@ function CreatePost({ onPostSuccess }) {
   const [image, setImage] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-      setUser(currentUser);
+    // Monitora o usuário do Firebase
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const token = await firebaseUser.getIdToken();
+          // Obter dados do usuário no backend (que deve retornar 'profile_image')
+          const response = await axios.get('http://localhost:8000/api/accounts/me/', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setUser(response.data);
+        } catch (error) {
+          console.error('Erro ao buscar dados do usuário:', error);
+        }
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -32,7 +56,7 @@ function CreatePost({ onPostSuccess }) {
     }
 
     try {
-      const token = await user.getIdToken();
+      const token = await auth.currentUser.getIdToken();
       const formData = new FormData();
       formData.append('content', text);
       if (image) {
@@ -55,17 +79,23 @@ function CreatePost({ onPostSuccess }) {
     }
   };
 
-  const displayName = user?.displayName || 'Usuário';
+  // Lógica de fallback para a foto do usuário:
+  // Se user.profile_image existir, usa getFullImageUrl para garantir URL completa;
+  // senão, usa '/default-avatar.png'
+  const userPic = user && user.profile_image
+    ? getFullImageUrl(user.profile_image)
+    : '/default-avatar.png';
 
   return (
     <div className="create-post-container">
       <div className="create-post-header">
+        {/* Foto de perfil do usuário */}
         <img
-          src={user?.photoURL || '/default-avatar.png'}
+          src={userPic}
           alt="Foto do usuário"
           className="create-post-avatar"
         />
-        <span className="create-post-user-name">{displayName}</span>
+        <span className="create-post-user-name">{user ? user.name : 'Usuário'}</span>
       </div>
 
       <div className="create-post-input-area">
@@ -88,6 +118,8 @@ function CreatePost({ onPostSuccess }) {
         <button onClick={handlePost} className="create-post-button">
           Postar
         </button>
+
+        {/* Opcional: mostrar o nome do arquivo e preview */}
         {image && <p className="file-name">{image.name}</p>}
         {image && (
           <div className="image-preview">

@@ -1,4 +1,3 @@
-// ProfilePage.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { auth } from '../firebaseConfig';
@@ -55,32 +54,40 @@ function ProfilePage() {
   if (errorMsg) return <div>{errorMsg}</div>;
   if (!profile) return <div>Carregando perfil...</div>;
 
+  // Lógica de fallback para a foto de perfil:
+  const profilePic = profile.profile_image || '/default-avatar.png';
+
   return (
     <div className="profile-container">
-      <div className="profile-header">
+      {/* Adiciona position: relative para posicionamento absoluto do botão */}
+      <div className="profile-header" style={{ position: 'relative' }}>
         <img
           className="cover-photo"
-          src={profile.coverPhoto || '/default-cover.png'}
+          src={profile.cover_image || '/default-cover.png'}
           alt="Cover"
         />
         <div className="profile-info">
-          {/* Exibe o botão de editar somente se o username da URL for o mesmo que o do perfil */}
-          {profile.username === username && (
-            <button onClick={() => setShowEditModal(true)}>Editar Perfil</button>
-          )}
           <img
             className="profile-avatar"
-            src={profile.avatar || '/default-avatar.png'}
+            src={profilePic}
             alt="Avatar"
           />
           <h2>{profile.name || 'Nome do usuário'}</h2>
           <p>@{profile.username}</p>
-          <p className="bio">{profile.bio}</p>
           <div className="profile-stats">
             <span>{profile.following_count} seguindo</span>
             <span>{profile.followers_count} seguidores</span>
           </div>
         </div>
+        {/* Botão de Editar Perfil posicionado no canto inferior direito */}
+        {profile.username === username && (
+          <button 
+            className="edit-profile-button" 
+            onClick={() => setShowEditModal(true)}
+          >
+            Editar Perfil
+          </button>
+        )}
       </div>
 
       {showEditModal && (

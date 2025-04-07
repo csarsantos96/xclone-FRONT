@@ -1,7 +1,8 @@
-// MainLayout.jsx
-import React from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import axios from 'axios';
 import './MainLayout.css';
 
 function slugify(text) {
@@ -14,7 +15,28 @@ function slugify(text) {
 }
 
 function MainLayout() {
-  const { firebaseUser } = useAuth();
+  const { firebaseUser } = useAuth(); // Obtém o firebaseUser do hook
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    // Função para buscar os dados do usuário no backend
+    const fetchBackendUser = async () => {
+      if (firebaseUser) {
+        try {
+          const token = await firebaseUser.getIdToken();
+          // Supondo que você tenha um endpoint '/api/accounts/me/' que retorna os dados do usuário logado
+          const response = await axios.get('http://localhost:8000/api/accounts/me/', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setCurrentUser(response.data);
+        } catch (error) {
+          console.error('Erro ao buscar usuário do backend:', error);
+        }
+      }
+    };
+
+    fetchBackendUser();
+  }, [firebaseUser]);
 
   return (
     <div className="app-container">
@@ -36,8 +58,8 @@ function MainLayout() {
               </Link>
             </li>
             <li>
-              {firebaseUser ? (
-                <Link to={`/profile/${slugify(firebaseUser.displayName || firebaseUser.name || firebaseUser.uid)}`}>
+              {currentUser ? (
+                <Link to={`/profile/${slugify(currentUser.username)}`}>
                   <i className="fa-regular fa-user"></i>
                   <span>Profile</span>
                 </Link>

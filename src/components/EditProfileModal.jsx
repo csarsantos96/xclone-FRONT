@@ -1,42 +1,43 @@
-// EditProfileModal.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
 import './EditProfileModal.css';
 
 function EditProfileModal({ user, firebaseUser, onClose, onProfileUpdated }) {
   const [name, setName] = useState(user.name || '');
-  const [username, setUsername] = useState(user.username || '');
-  const [bio, setBio] = useState(user.bio || '');
   const [profileImage, setProfileImage] = useState(null);
+  const [coverImage, setCoverImage] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleFileChange = (e) => {
+  const handleProfileImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setProfileImage(e.target.files[0]);
     }
   };
 
-  const handleSubmit = async () => {
-    if (bio.length > 140) {
-      setErrorMsg('A bio deve ter no máximo 140 caracteres.');
-      return;
+  const handleCoverImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setCoverImage(e.target.files[0]);
     }
+  };
+
+  const handleSubmit = async () => {
     setLoading(true);
     setErrorMsg('');
-    
+
     const formData = new FormData();
     formData.append('name', name);
-    formData.append('username', username);
-    formData.append('bio', bio);
     if (profileImage) {
       formData.append('profile_image', profileImage);
+    }
+    if (coverImage) {
+      formData.append('cover_image', coverImage);
     }
 
     try {
       const token = await firebaseUser.getIdToken();
       const response = await axios.patch(
-        `http://localhost:8000/api/accounts/${username}/`,
+        `http://localhost:8000/api/accounts/${user.username}/`,
         formData,
         {
           headers: {
@@ -57,34 +58,68 @@ function EditProfileModal({ user, firebaseUser, onClose, onProfileUpdated }) {
 
   return (
     <div className="modal-backdrop">
-      <div className="modal-content">
+      <div className="modal-content edit-profile-modal">
         <h2>Editar Perfil</h2>
         {errorMsg && <p className="error-msg">{errorMsg}</p>}
-        <label>Foto de Perfil:</label>
-        <input type="file" accept="image/*" onChange={handleFileChange} />
-        <label>Nome:</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <label>Nome de Usuário:</label>
-        <input
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <label>Bio (máx. 140 caracteres):</label>
-        <textarea
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-          maxLength={140}
-        />
+
+        <div className="input-group">
+          <label htmlFor="profileImage">Foto de Perfil:</label>
+          <label htmlFor="profileImage" className="file-input-label">
+            Escolher arquivo
+          </label>
+          <input
+            id="profileImage"
+            type="file"
+            accept="image/*"
+            onChange={handleProfileImageChange}
+            className="file-input"
+          />
+          <span className="file-chosen">
+            {profileImage ? profileImage.name : 'Nenhum arquivo escolhido'}
+          </span>
+        </div>
+
+        <div className="input-group">
+          <label htmlFor="coverImage">Foto de Capa:</label>
+          <label htmlFor="coverImage" className="file-input-label">
+            Escolher arquivo
+          </label>
+          <input
+            id="coverImage"
+            type="file"
+            accept="image/*"
+            onChange={handleCoverImageChange}
+            className="file-input"
+          />
+          <span className="file-chosen">
+            {coverImage ? coverImage.name : 'Nenhum arquivo escolhido'}
+          </span>
+        </div>
+
+        <div className="input-group">
+          <label>Nome:</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="text-input"
+          />
+        </div>
+
         <div className="modal-actions">
-          <button onClick={handleSubmit} disabled={loading}>
+          <button 
+            className="save-button" 
+            onClick={handleSubmit} 
+            disabled={loading}
+          >
             {loading ? 'Salvando...' : 'Salvar'}
           </button>
-          <button onClick={onClose}>Cancelar</button>
+          <button 
+            className="cancel-button" 
+            onClick={onClose}
+          >
+            Cancelar
+          </button>
         </div>
       </div>
     </div>

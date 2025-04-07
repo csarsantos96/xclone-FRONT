@@ -52,17 +52,14 @@ function TweetCard({ tweet, token, onDelete, onLiked, onRepost }) {
     }
   };
 
-  // Função para abrir o modal de reply (exemplo simples)
   const handleReply = () => {
     alert('Abrir modal de reply para o tweet!');
   };
 
-  // Abre o modal de repost
   const handleRepost = () => {
     setShowRepostModal(true);
   };
 
-  // Confirma o repost: faz a requisição, retorna o novo tweet e o adiciona ao feed
   const confirmRepost = async () => {
     setShowRepostModal(false);
     try {
@@ -82,13 +79,19 @@ function TweetCard({ tweet, token, onDelete, onLiked, onRepost }) {
     }
   };
 
+  // Fallback para a foto do autor
+  const authorPic = tweet.author?.profile_image || '/default-avatar.png';
+
   return (
     <div className="tweet-card">
       <div className="author">
         {tweet.author ? (
           <>
-            <div className="author-name">{tweet.author.name}</div>
-            <div className="author-username">@{tweet.author.username}</div>
+            <img className="tweet-avatar" src={authorPic} alt="Avatar" />
+            <div className="author-info">
+              <div className="author-name">{tweet.author.name}</div>
+              <div className="author-username">@{tweet.author.username}</div>
+            </div>
           </>
         ) : (
           'Anônimo'
