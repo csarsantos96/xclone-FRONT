@@ -1,64 +1,84 @@
+// Login.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
+import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from '../firebaseConfig';
+import GoogleLoginButton from './GoogleLoginButton';
 import { useNavigate } from 'react-router-dom';
+import ForgotPassword from './ForgotPassword'; // importar o componente
 import './Login.css';
 
-const Login = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
-
+function Login() {
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [showForgot, setShowForgot] = useState(false); // controla a tela de "Esqueceu a senha"
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log("Tentando criar conta...");
+  const loginComEmailESenha = async () => {
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/token/', {
-        username,
-        password,
-      });
-      // Exemplo: se o backend retornar algo como { token: "abc123" }
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('refreshToken', response.data.refresh);
+      await signInWithEmailAndPassword(auth, email, senha);
+      console.log("Logado com email/senha");
       navigate('/feed');
-    } catch (err) {
-      setError('Credenciais inválidas. Verifique usuário e senha.');
-      console.error(err);
+    } catch (error) {
+      console.error("Erro no login por email:", error.message);
     }
   };
 
+  const loginComGoogle = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      console.log("Logado com Google");
+      navigate('/feed');
+    } catch (error) {
+      console.error("Erro no login com Google:", error.message);
+    }
+  };
+
+  // Se showForgot = true, renderizamos a tela de esqueci a senha
+  if (showForgot) {
+    return <ForgotPassword onBack={() => setShowForgot(false)} />;
+  }
+
+  // Senão, a tela de login normal
   return (
     <div className="container">
-      <h2 className="title">Entrar</h2>
-      {error && <div className="error">{error}</div>}
-      <form onSubmit={handleSubmit} className="form">
-        <label className="label" htmlFor="username">Usuário</label>
+      <h2 className="title">Login</h2>
+
+      <div className="form">
+        <label className="label" htmlFor="email">Email</label>
         <input
+          id="email"
+          type="email"
+          placeholder="Email"
           className="input"
-          type="text"
-          id="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
         />
 
-        <label className="label" htmlFor="password">Senha</label>
+        <label className="label" htmlFor="senha">Senha</label>
         <input
-          className="input"
+          id="senha"
           type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Senha"
+          className="input"
+          onChange={(e) => setSenha(e.target.value)}
         />
 
-        <button type="submit" className="button">Entrar</button>
-      </form>
+        <button onClick={loginComEmailESenha} className="button">
+          Entrar com Email
+        </button>
+      </div>
 
-      <p className="signup">
-        Não tem uma conta? <a href="/" className="link">Crie agora</a>
+      {/* Botão de login com Google */}
+      <GoogleLoginButton onGoogleLogin={loginComGoogle} className="button google-button" />
+
+      {/* Link "Esqueceu a senha?" logo abaixo do botão */}
+      <p
+        style={{ marginTop: '1rem', cursor: 'pointer', color: '#1d9bf0', textDecoration: 'underline' }}
+        onClick={() => setShowForgot(true)}
+      >
+        Esqueceu a senha?
       </p>
     </div>
   );
-};
+}
 
 export default Login;

@@ -58,6 +58,8 @@
   cursor: pointer;
   text-align: center;
   border-radius: 4px;
+  background-color: #1d9bf0;
+  border-radius: 9999px;
 }
 
 
@@ -66,10 +68,10 @@
   width: 300px;      
   padding: 10px 16px; 
   font-size: 16px;    
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 9999px;
   cursor: pointer;
   text-decoration: none;
+  background-color: #1d9bf0;
   
 }
 
@@ -118,17 +120,15 @@
 
 .link {
   width: 300px;
-  display: inline-block;        /* Garante que respeite altura e largura do padding */
+  display: inline-block;        
   padding: 10px 16px;
-  border: 1px solid #fff;
-  border-radius: 9999px;        /* "Pílula" */
-  background-color: transparent;
+  border-radius: 9999px;        
+  background-color: #1d9bf0;
   color: #fff;
-  text-decoration: none;        /* Remove sublinhado padrão */
+  text-decoration: none;        
   cursor: pointer;
   text-align: center;
 
-  /* Transição suave ao hover */
   transition: background-color 0.2s ease, color 0.2s ease;   
   
 }
@@ -139,6 +139,5 @@
 
 
 .button:hover {
-  background-color: #333;
+  background-color: #3fabf3;
 }
-

@@ -1,0 +1,120 @@
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content.edit-profile-modal {
+  position: relative;
+  background-color: #192734;
+  border-radius: 8px;
+  padding: 20px;
+  width: 90%;
+  max-width: 500px;
+  color: #fff;
+}
+
+/* Estiliza a mensagem de erro */
+.error-msg {
+  color: #f00;
+  margin-bottom: 10px;
+}
+
+/* Grupo de inputs (label + file input + texto do arquivo escolhido) */
+.input-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Estiliza o label normal */
+.input-group label {
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Inputs de texto */
+.text-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background-color: #15202B;
+  color: #fff;
+}
+
+/* File input real (fica escondido) */
+.file-input {
+  display: none;
+}
+
+/* Botão de escolher arquivo */
+.file-input-label {
+  display: inline-block;
+  padding: 6px 12px;
+  background-color: #1d9bf0;
+  color: #fff;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  width: fit-content;
+}
+
+.file-input-label:hover {
+  background-color: #1a8cd8;
+}
+
+/* Texto que mostra o nome do arquivo */
+.file-chosen {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin-left: 0;
+}
+
+/* Área dos botões */
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Botão de salvar */
+.save-button {
+  background-color: #1d9bf0;
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.save-button:hover {
+  background-color: #1a8cd8;
+}
+
+/* Botão de cancelar */
+.cancel-button {
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 8px 16px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cancel-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
+import './Login.css';
 
 function GoogleLoginButton() {
 

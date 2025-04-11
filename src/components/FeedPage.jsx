@@ -1,61 +1,82 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './FeedPage.css';
-
+import { auth } from '../firebaseConfig';
+import { onAuthStateChanged } from "firebase/auth";
 import CreatePost from '../components/CreatePost';
+import LogoutButton from './LogOutButton';
+import TweetCard from './TweetCard';
+import './FeedPage.css'; // Arquivo de estilos
 
 function FeedPage() {
-const [tweets, setTweets] = useState([]);
+  const [tweets, setTweets] = useState([]);
+  const [firebaseUser, setFirebaseUser] = useState(null);
+  const [token, setToken] = useState('');
 
-
-const fetchTweets = () => {
-    axios.get('http://localhost:8000/api/tweets/feed/',{
+  const fetchTweets = async (user) => {
+    if (!user) return;
+    try {
+      const t = await user.getIdToken();
+      setToken(t);
+      const response = await axios.get("https://csaruto96.pythonanywhere.com/api/tweets/feed/", {
         headers: {
-            Authorization: `Token 15a2bbc2a1b640eba442e1b44d8b8ca00ae83207` 
-        }
-    })
-    .then(response => {
-        setTweets(response.data.results);
-    })
-    .catch(error => {
-        console.error('Erro ao buscar tweets:', error);
+          Authorization: `Bearer ${t}`,
+        },
+      });
+      setTweets(response.data.results || response.data);
+    } catch (error) {
+      console.error("Erro ao buscar tweets:", error);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setFirebaseUser(user);
+        fetchTweets(user);
+      } else {
+        console.log("Usuário não logado.");
+      }
     });
-};
+    return () => unsubscribe();
+  }, []);
 
+  // Função para atualizar a lista de tweets após a exclusão
+  const handleDeleteTweet = (tweetId) => {
+    setTweets((prevTweets) => prevTweets.filter(tweet => tweet.id !== tweetId));
+  };
 
-useEffect(() => {
-    fetchTweets();
-}, []);
+  // Função para inserir o novo tweet (retweet) no feed
+  const handleRepostInFeed = (newTweet) => {
+    setTweets((prevTweets) => [newTweet, ...prevTweets]);
+  };
 
-return (
+  return (
     <div className="feed-container">
-    <h2 style={{ textAlign: 'center', margin: '20px 0' }}>Feed de Tweets</h2>
-    <CreatePost onPostSuccess={fetchTweets} />
-{tweets.length === 0 ? (
-        <p>Nenhum tweet disponível.</p>
-    ) : (
-        tweets.map(tweet => (
-        <div key={tweet.id} className="tweet-card">
-            <p className="author">@{tweet.author}</p>
-            <p className="content">{tweet.content}</p>
-            <p className="date">{new Date(tweet.created_at).toLocaleString()}</p>
+      {/* Barra superior */}
+      <header className="top-bar">
+        <h2>Home</h2>
+        <LogoutButton />
+      </header>
 
-            <div className="tweet-actions">
-                <button className="action-button">❤️ {tweet.likes || 0}</button>
-                <button className="action-button">💬 {tweet.comments?.length || 0}</button>
-                <button className="action-button">🔁</button>
-</div>
+      {/* Caixa de criação de post */}
+      <CreatePost onPostSuccess={() => fetchTweets(firebaseUser)} />
 
-            {tweet.media && (
-            <div className="media">
-                <a href={tweet.media} target="_blank" rel="noopener noreferrer">Ver mídia</a>
-            </div>
-            )}
-        </div>
+      {/* Lista de tweets */}
+      {tweets.length === 0 ? (
+        <p>Nenhum tweet por enquanto.</p>
+      ) : (
+        tweets.map((tweet) => (
+          <TweetCard 
+            key={tweet.id} 
+            tweet={{ ...tweet, currentUserId: firebaseUser?.id }}
+            token={token}
+            onDelete={handleDeleteTweet}
+            onRepost={handleRepostInFeed}
+          />
         ))
-    )}
+      )}
     </div>
-);
+  );
 }
 
 export default FeedPage;

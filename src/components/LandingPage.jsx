@@ -26,7 +26,7 @@ return (
 
         <div className="login-buttons">
         <GoogleLoginButton />
-      
+    
         </div>
 
         <div className="or-container">
