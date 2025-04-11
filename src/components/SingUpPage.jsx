@@ -31,7 +31,7 @@ function SignUpPage() {
       const token = await userCredential.user.getIdToken();
 
       // Envia os dados para o backend para inserir no PostgreSQL
-      const response = await fetch('http://localhost:8000/api/accounts/createUser/', {
+      const response = await fetch('https://csaruto96.pythonanywhere.com/api/accounts/createUser/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ function SignUpPage() {
       const token = await userCredential.user.getIdToken();
 
       // Envia os dados para o backend
-      const response = await fetch('http://localhost:8000/api/accounts/createUser/', {
+      const response = await fetch('https://csaruto96.pythonanywhere.com/api/accounts/createUser/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

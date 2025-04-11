@@ -25,7 +25,7 @@ function MainLayout() {
         try {
           const token = await firebaseUser.getIdToken();
           // Supondo que você tenha um endpoint '/api/accounts/me/' que retorna os dados do usuário logado
-          const response = await axios.get('http://localhost:8000/api/accounts/me/', {
+          const response = await axios.get('https://csaruto96.pythonanywhere.com/api/accounts/me/', {
             headers: { Authorization: `Bearer ${token}` },
           });
           setCurrentUser(response.data);

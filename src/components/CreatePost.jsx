@@ -12,7 +12,7 @@ function getFullImageUrl(imagePath) {
     return imagePath;
   }
   // Caso contrário, concatena a URL base (ajuste conforme seu ambiente)
-  return `http://localhost:8000${imagePath}`;
+  return `https://csaruto96.pythonanywhere.com${imagePath}`;
 }
 
 function CreatePost({ onPostSuccess }) {
@@ -27,7 +27,7 @@ function CreatePost({ onPostSuccess }) {
         try {
           const token = await firebaseUser.getIdToken();
           // Obter dados do usuário no backend (que deve retornar 'profile_image')
-          const response = await axios.get('http://localhost:8000/api/accounts/me/', {
+          const response = await axios.get('https://csaruto96.pythonanywhere.com/api/accounts/me/', {
             headers: { Authorization: `Bearer ${token}` },
           });
           setUser(response.data);
@@ -63,7 +63,7 @@ function CreatePost({ onPostSuccess }) {
         formData.append('media', image);
       }
 
-      await axios.post('http://localhost:8000/api/tweets/', formData, {
+      await axios.post('https://csaruto96.pythonanywhere.com/api/tweets/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,

@@ -37,7 +37,7 @@ function EditProfileModal({ user, firebaseUser, onClose, onProfileUpdated }) {
     try {
       const token = await firebaseUser.getIdToken();
       const response = await axios.patch(
-        `http://localhost:8000/api/accounts/${user.username}/`,
+        `https://csaruto96.pythonanywhere.com/api/accounts/${user.username}/`,
         formData,
         {
           headers: {

@@ -17,7 +17,7 @@ function FeedPage() {
     try {
       const t = await user.getIdToken();
       setToken(t);
-      const response = await axios.get("http://localhost:8000/api/tweets/feed/", {
+      const response = await axios.get("https://csaruto96.pythonanywhere.com/api/tweets/feed/", {
         headers: {
           Authorization: `Bearer ${t}`,
         },

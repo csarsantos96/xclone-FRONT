@@ -27,7 +27,7 @@ function ExplorePage() {
       const token = await firebaseUser.getIdToken();
       // Corrige a URL para bater com o endpoint do backend
       const response = await axios.get(
-        `http://localhost:8000/api/accounts/search/?query=${encodeURIComponent(query)}`,
+        `https://csaruto96.pythonanywhere.com/api/accounts/search/?query=${encodeURIComponent(query)}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       // Ajusta conforme sua resposta (se é response.data.results ou response.data)

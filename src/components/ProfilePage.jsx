@@ -37,7 +37,7 @@ function ProfilePage() {
         const token = await firebaseUser.getIdToken();
         // Obtém os dados do usuário pelo username (rota do backend)
         const userResponse = await axios.get(
-          `http://localhost:8000/api/accounts/${username}/`,
+          `https://csaruto96.pythonanywhere.com/api/accounts/${username}/`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const fetchedProfile = userResponse.data;
@@ -48,7 +48,7 @@ function ProfilePage() {
         }
         // Obtém os tweets do usuário
         const tweetsResponse = await axios.get(
-          `http://localhost:8000/api/tweets/user/${username}/`,
+          `https://csaruto96.pythonanywhere.com/api/tweets/user/${username}/`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setTweets(tweetsResponse.data.results || tweetsResponse.data);
@@ -77,7 +77,7 @@ function ProfilePage() {
     try {
       const token = await firebaseUser.getIdToken();
       const response = await axios.post(
-        `http://localhost:8000/api/accounts/follow/${profile.username}/`,
+        `https://csaruto96.pythonanywhere.com/api/accounts/follow/${profile.username}/`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

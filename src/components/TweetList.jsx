@@ -8,7 +8,7 @@ function TweetCard({ tweet, token, onLiked }) {
   const handleLike = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:8000/api/tweets/${tweet.id}/like/`, // URL correta para curtir
+        `https://csaruto96.pythonanywhere.com/api/tweets/${tweet.id}/like/`, // URL correta para curtir
         {},
         {
           headers: {

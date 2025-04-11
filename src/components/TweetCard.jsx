@@ -24,7 +24,7 @@ function TweetCard({ tweet, token, onDelete, onLiked, onRepost }) {
   const handleLike = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:8000/api/tweets/${tweet.id}/like/`,
+        `https://csaruto96.pythonanywhere.com/api/tweets/${tweet.id}/like/`,
         {},
         {
           headers: {
@@ -41,7 +41,7 @@ function TweetCard({ tweet, token, onDelete, onLiked, onRepost }) {
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8000/api/tweets/${tweet.id}/`, {
+      await axios.delete(`https://csaruto96.pythonanywhere.com/api/tweets/${tweet.id}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -64,7 +64,7 @@ function TweetCard({ tweet, token, onDelete, onLiked, onRepost }) {
     setShowRepostModal(false);
     try {
       const response = await axios.post(
-        `http://localhost:8000/api/tweets/${tweet.id}/retweet/`,
+        `https://csaruto96.pythonanywhere.com/api/tweets/${tweet.id}/retweet/`,
         {},
         {
           headers: {
