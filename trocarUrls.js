@@ -3,7 +3,7 @@ const path = require('path');
 
 const pastaBase = './src'; // ajuste se seu código estiver em outra pasta
 const antigo = 'http://localhost:8000';
-const novo = 'https://csaruto96.pythonanywhere.com';
+const novo = 'https://csaruto96.pythonanywhere.com;'
 
 function trocarURLEmArquivo(caminhoArquivo) {
   let conteudo = fs.readFileSync(caminhoArquivo, 'utf-8');
